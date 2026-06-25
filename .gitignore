@@ -1,0 +1,15 @@
+.env
+.mcp.json
+
+node_modules/
+frontend/node_modules/
+
+media/uploads/
+*.mp4
+
+snapshots/
+exports/
+findings/
+
+__pycache__/
+*.pyc

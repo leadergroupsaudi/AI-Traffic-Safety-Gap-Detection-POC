@@ -1,0 +1,121 @@
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+}
+
+/* ── Page main ─────────────────────────────────── */
+.page-main {
+  flex: 1;
+  padding: 24px 28px;
+  max-width: 1460px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Rules page content grid ──────────────────── */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── Placeholder page ─────────────────────────── */
+.placeholder-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.placeholder-inner {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.placeholder-inner h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.placeholder-inner p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.placeholder-inner strong {
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+/* ── Scan gate (no-data placeholder) ─────────────── */
+.scan-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  gap: 16px;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.scan-gate-icon-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(59,130,246,0.08);
+  border: 1.5px solid rgba(59,130,246,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.scan-gate-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.scan-gate-sub {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 420px;
+  margin: 0;
+}
+
+.scan-gate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 9px;
+  padding: 11px 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.scan-gate-btn:hover { background: var(--blue-dark); }
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}

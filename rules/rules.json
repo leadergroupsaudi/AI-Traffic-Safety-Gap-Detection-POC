@@ -1,0 +1,213 @@
+{
+  "rules": [
+    {
+      "rule_id": "R01",
+      "object": "potholes",
+      "finding": "Road Surface Defect — Pothole Detected",
+      "severity": "HIGH",
+      "regulatory_reference": "MOMAH General Specifications for Urban Roads Construction | Saudi Highway Code SHC | Roads General Authority (RGA) Maintenance Obligations",
+      "recommended_action": "Report via the Balady platform (balady.gov.sa) under MOMAH General Specifications for Urban Roads Construction. The responsible municipality or contracted maintenance entity is legally obligated to inspect and repair the road surface defect. Unaddressed potholes causing vehicle damage or accidents may result in legal liability for the contractor or municipal authority under Saudi law. Commission immediate pavement assessment and schedule urgent repair works."
+    },
+    {
+      "rule_id": "R02",
+      "object": "missing_road_marking",
+      "finding": "Missing Road Marking — Visibility Compliance Failure",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Highway Code SHC 602 (Saudi MUTCD) | MOMAH Urban Roads Maintenance Obligations",
+      "recommended_action": "Inspect per Saudi Highway Code SHC 602 (Saudi Manual on Uniform Traffic Control Devices). Road markings must be visible day and night and incorporate retroreflective properties using glass beads in thermoplastic or approved materials. MOMAH municipalities are responsible for rehabilitating faded or missing ground markings on urban roads. Schedule immediate repainting using compliant thermoplastic retroreflective material. Report via the Balady platform if within municipal jurisdiction."
+    },
+    {
+      "rule_id": "R03",
+      "object": "damaged_sidewalks",
+      "finding": "Damaged Sidewalk — Pedestrian Safety Non-Compliance",
+      "severity": "MEDIUM",
+      "regulatory_reference": "MOMAH Sidewalks, Islands & Medians Design Manual | Saudi Building Code (SBC) Accessibility Requirements | Universal Accessibility: Built Environment Guidelines (KSCDR)",
+      "recommended_action": "Inspect per the MOMAH Sidewalks, Islands & Medians Design Manual. Sidewalks must comply with Universal Accessibility Built Environment Guidelines (issued by KSCDR) ensuring safe, unobstructed pedestrian passage with proper gradients, adequate widths, and curb cuts for persons with disabilities. Damaged sections must be repaired to restore structural integrity and accessibility compliance. Failure to maintain safe pedestrian pathways is a breach of MOMAH urban road maintenance obligations. Report via the Balady platform or the 940 municipal call center."
+    },
+    {
+      "rule_id": "R04",
+      "object": "construction_waste",
+      "finding": "Construction Waste Obstruction on Public Road",
+      "severity": "HIGH",
+      "regulatory_reference": "MOMAH Requirements for Disposal of Construction, Demolition & Renovation Waste | MWAN (National Center for Waste Management) Regulations | Municipal Violations Penalty Regulations",
+      "recommended_action": "Report under MOMAH Requirements for the Disposal of Construction, Demolition, and Renovation Waste. Dumping construction waste on public roads is a municipal violation carrying fines of up to SAR 50,000. Contractors are legally obligated to transport all waste to designated disposal sites using licensed vehicles. Non-removal of debris after completing works attracts additional fines of SAR 3,000–10,000. Coordinate with the municipality to issue a compliance notice to the responsible contractor and enforce immediate site clearance."
+    },
+    {
+      "rule_id": "R05",
+      "object": "waste_accumulation",
+      "finding": "Waste Accumulation on Public Road or Pavement",
+      "severity": "LOW",
+      "regulatory_reference": "MOMAH Waste Management Law | Municipal Violations Penalty Regulations | Balady Platform Enforcement",
+      "recommended_action": "Report under the MOMAH Waste Management Law and Municipal Violations Penalty Regulations. Improper waste disposal and littering on public roads or pavements carries fines of SAR 200–1,000 per incident, with escalating penalties for repeat violations. Schedule a municipal cleaning operation and issue compliance notices to responsible parties. Municipalities have authority to disconnect utility services for sites failing to correct major violations. Report via the Balady platform or Mumtathil enforcement portal."
+    },
+    {
+      "rule_id": "R06",
+      "object": "damaged_vehicle_on_road",
+      "finding": "Damaged or Abandoned Vehicle — Road Obstruction",
+      "severity": "HIGH",
+      "regulatory_reference": "MOMAH Municipal Regulations on Abandoned Vehicles | Saudi Traffic Law (Moroor) | Absher Platform Enforcement",
+      "recommended_action": "Report per MOMAH municipal regulations on abandoned vehicles. Vehicles left on public roads for more than seven days are subject to impoundment by municipal or traffic authorities (Moroor). Owner is notified via Absher platform. If the vehicle is causing active road obstruction or safety hazard, contact Moroor (911) for immediate removal. Vehicle owner is liable for towing and storage fees plus applicable traffic violation fines. Ensure the scene is marked with warning signs until the obstruction is cleared."
+    },
+    {
+      "rule_id": "R07",
+      "object": "safety_and_excavation_works",
+      "finding": "Excavation Work Zone — Safety Non-Compliance",
+      "severity": "HIGH",
+      "regulatory_reference": "MOMAH Traffic Control at Work Sites Guide | MOMAH Comprehensive Regulatory Guide for Civil Infrastructure Works | Balady Platform Excavation Permit Requirements",
+      "recommended_action": "Inspect per the MOMAH Traffic Control at Work Sites Guide and Comprehensive Regulatory Guide for Civil Infrastructure Works. All excavation works on public roads require a permit issued via the Balady platform, including a site safety plan and traffic management plan. Mandatory safety requirements: barricades with reflective strips and warning lights around the full work zone, adequate pedestrian detour if sidewalk is blocked, and shoring for excavations deeper than 1.5 metres. Materials must be kept at least 1 metre from the excavation edge. Non-compliant sites must be reported to the local municipality (Amanah) infrastructure coordination office for immediate enforcement action."
+    },
+    {
+      "rule_id": "R08",
+      "object": "random_bumps",
+      "finding": "Unauthorized Speed Hump Detected",
+      "severity": "MEDIUM",
+      "regulatory_reference": "SASO GSO 2084:2010 | Saudi Highway Code SHC 602",
+      "recommended_action": "Verify compliance with SASO GSO 2084:2010. Speed humps require an engineering study and formal municipal approval via the Balady platform per Saudi Highway Code SHC 602. Speed humps installed without approval must be removed. Ensure warning signs and reflective markings are in place if the hump is authorized."
+    },
+    {
+      "rule_id": "R09",
+      "object": "manholes",
+      "finding": "Manhole Cover Infrastructure Issue",
+      "severity": "HIGH",
+      "regulatory_reference": "MOMAH General Specifications for Urban Roads Construction | Saudi Highway Code SHC",
+      "recommended_action": "Inspect per MOMAH General Specifications for Urban Roads Construction. Manhole covers must be flush with the pavement surface — protruding or sunken covers are classified as significant road hazards. Covers must have anti-slip properties and withstand applicable traffic load categories. Report to the relevant utility authority for immediate inspection and rectification."
+    },
+    {
+      "rule_id": "R10",
+      "object": "graffitti",
+      "finding": "Unauthorized Graffiti on Public Infrastructure",
+      "severity": "LOW",
+      "regulatory_reference": "MOMAH Municipal Violations Penalty Regulations | Ministry of Interior Public Decency Regulations",
+      "recommended_action": "Report under MOMAH Municipal Violations Penalty Regulations. Unauthorized graffiti on public property is a violation carrying fines of SAR 500–1,000 (doubled for repeat offenses). Coordinate with the municipality for surface cleaning and restoration. Violators are liable for full restoration costs in addition to the fine."
+    },
+    {
+      "rule_id": "R11",
+      "object": "damaged_commercial_stores_signage",
+      "finding": "Damaged Commercial Signage — Municipal Compliance Violation",
+      "severity": "LOW",
+      "regulatory_reference": "MOMAH Regulatory Guide for Commercial Signage (Balady Platform)",
+      "recommended_action": "Report under the MOMAH Regulatory Guide for Commercial Signage. Business owners are legally required to maintain commercial signage in good condition and remove any expired or damaged signs immediately. Notify the commercial property owner to repair or remove the damaged signage. Non-compliance may result in municipal penalties enforced via the Balady platform."
+    },
+    {
+      "rule_id": "R12",
+      "object": "cleanliness_of_public_places",
+      "finding": "Public Place Cleanliness Violation",
+      "severity": "LOW",
+      "regulatory_reference": "MOMAH Waste Management Law | Municipal Violations Penalty Regulations",
+      "recommended_action": "Report under the MOMAH Waste Management Law and Municipal Violations Penalty Regulations. Littering and improper waste disposal in public places carry fines of SAR 200–1,000 per incident. Schedule a municipal cleaning operation and issue compliance notice to responsible parties. Repeat violations attract escalating penalties."
+    },
+    {
+      "rule_id": "R13",
+      "object": "buildings_under_construction",
+      "finding": "Construction Site Safety Non-Compliance",
+      "severity": "HIGH",
+      "regulatory_reference": "MOMAH Guide for Fencing Construction Sites | MOMAH Covering Buildings Under Construction Guidelines",
+      "recommended_action": "Inspect per the MOMAH Guide for Fencing Construction Sites. Mandatory requirements include: proper hoarding or fencing around the full perimeter, high-visibility reflective warning and directional signage, and an alternative safe pedestrian path if the sidewalk is blocked. Violations can result in financial penalties and suspension of the project license. Report to the local municipality (Amanah) for enforcement action."
+    },
+    {
+      "rule_id": "R14",
+      "object": "painting_of_curbstone",
+      "finding": "Curbstone Marking Condition Issue",
+      "severity": "LOW",
+      "regulatory_reference": "MOMAH General Specifications Guide for Road Construction and Structures | Saudi Highway Code SHC",
+      "recommended_action": "Inspect per the MOMAH General Specifications Guide for Road Construction. Curbstone markings must be weather-resistant, durable under Saudi climatic conditions, and retroreflective using glass beads for night visibility. Faded, chipped, or missing curbstone paint must be repainted to restore road boundary clarity and traffic safety. Coordinate with the local municipality maintenance department for repainting works."
+    },
+
+    {
+      "rule_id": "H01",
+      "object": "fire_hydrant",
+      "finding": "Fire Hydrant Access Obstruction Risk",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Building Code SBC 801 (Fire Protection) | Saudi Civil Defense (SCD) Regulations | MOMAH Urban Infrastructure Standards",
+      "recommended_action": "Inspect per Saudi Building Code SBC 801 and Saudi Civil Defense (SCD) regulations. Fire hydrants must be completely unobstructed on all sides to allow immediate emergency crew access. Any vehicle, construction material, landscaping, or debris blocking hydrant access is a serious violation. Facilities must conduct regular inspections and maintain documentation per SCD requirements. Failure to maintain clear hydrant access can result in failed Civil Defense inspections and denial of operational licenses. Report obstruction immediately to the local Civil Defense branch and the responsible municipality."
+    },
+    {
+      "rule_id": "H02",
+      "object": "emergency_sign",
+      "finding": "Emergency Directional Signage — Compliance Issue",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Highway Code SHC 602 — Emergency Facilities Signage (G11-Series) | MOMAH Urban Road Standards",
+      "recommended_action": "Inspect per Saudi Highway Code SHC 602 Emergency Facilities Signage standards (G11-Series). Emergency directional signs for hospitals and critical facilities must be clearly visible, properly positioned, retroreflective, and free from obstruction or damage. Faded, missing, or obstructed emergency signs can delay emergency response and endanger lives. Coordinate with the local Amanah (municipality) to repair, replace, or re-position non-compliant signs as per SHC 602 specifications."
+    },
+    {
+      "rule_id": "H03",
+      "object": "ambulance_entrance",
+      "finding": "Ambulance Entrance — Access Obstruction or Non-Compliance",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Building Code (SBC) Site Planning Requirements | CBAHI Hospital Accreditation Standards | MOMAH Urban Planning Guidelines | Saudi Red Crescent Authority (SRCA) Coordination Requirements",
+      "recommended_action": "Inspect per Saudi Building Code (SBC) site planning requirements and CBAHI hospital accreditation standards. Hospitals are required to maintain a dedicated, clearly marked, and permanently unobstructed ambulance entrance separate from general public access. Any vehicle, object, or construction blocking this access point must be removed immediately. Coordinate with Moroor (traffic authorities) if unauthorized vehicles are present. Non-compliance risks hospital accreditation failure. Contact SRCA (997) and local Civil Defense for emergency coordination if access is critically compromised."
+    },
+    {
+      "rule_id": "H04",
+      "object": "main_entrance",
+      "finding": "Hospital Main Entrance — Access or Safety Non-Compliance",
+      "severity": "MEDIUM",
+      "regulatory_reference": "Saudi Building Code (SBC) Accessibility Requirements | KSCDR Universal Accessibility Built Environment Guidelines | MOMAH Urban Planning Guidelines",
+      "recommended_action": "Inspect per Saudi Building Code (SBC) and KSCDR Universal Accessibility Built Environment Guidelines. Hospital main entrances must be clearly identified, fully accessible to persons with disabilities (proper ramps, curb cuts, minimum 1500mm clearance width), and free from obstructions. Sidewalks and paths approaching the main entrance must comply with MOMAH Sidewalks Design Manual. Report non-compliance to the local municipality and the Ministry of Human Resources and Social Development (HRSD) if accessibility standards are violated."
+    },
+    {
+      "rule_id": "H05",
+      "object": "illegal_parking",
+      "finding": "Illegal Parking in Restricted Zone",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Traffic Law (Moroor) | MOMAH Municipal Parking Regulations | Absher Platform Enforcement",
+      "recommended_action": "Report to Moroor (General Directorate of Traffic) under Saudi Traffic Law. Parking in restricted zones (emergency vehicle areas, no-parking zones, hospital entrances) carries fines of SAR 150–900 plus vehicle towing and impoundment. Parking that blocks ambulance access or emergency routes is treated as a serious violation. Contact Moroor via 911 or the Moroor app. Violations are increasingly captured by AI-powered cameras and enforced automatically through the Absher platform."
+    },
+    {
+      "rule_id": "H06",
+      "object": "ambulance_bay",
+      "finding": "Ambulance Bay Obstruction Detected",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Traffic Law (Moroor) — Emergency Zone Parking | CBAHI Hospital Accreditation Standards | Saudi Building Code (SBC)",
+      "recommended_action": "Report immediately to Moroor and hospital security. Parking in an ambulance bay is a serious traffic violation under Saudi Traffic Law, carrying fines up to SAR 900 plus mandatory towing. Ambulance bays must remain permanently clear to ensure emergency vehicle maneuverability per CBAHI hospital accreditation requirements and Saudi Building Code site planning standards. If a vehicle is obstructing the bay, contact Moroor (911) for immediate removal. Failure to maintain clear ambulance bays can jeopardize hospital accreditation status."
+    },
+    {
+      "rule_id": "H07",
+      "object": "ambulance_vehicle",
+      "finding": "Ambulance Vehicle Obstruction or Access Denial",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Traffic Law — Failure to Yield to Emergency Vehicles | SRCA (Saudi Red Crescent Authority) Operational Requirements",
+      "recommended_action": "Under Saudi Traffic Law, all road users must immediately yield to ambulances on the road. Failure to yield to an emergency vehicle carries fines of SAR 1,000–2,000 and is monitored by automated AI camera systems. If an ambulance vehicle is being obstructed or unable to access a location, contact Moroor (911) and SRCA (997) immediately. Ensure all road markings, access routes, and emergency lanes near the hospital are clear and compliant with SHC 602 standards to prevent recurring obstruction incidents."
+    },
+    {
+      "rule_id": "H08",
+      "object": "disabled_parking_ground_marking",
+      "finding": "Disabled Parking Marking — Compliance or Obstruction Issue",
+      "severity": "MEDIUM",
+      "regulatory_reference": "KSCDR Universal Accessibility Built Environment Guidelines | Saudi Highway Code (SHC) | Moroor Traffic Law — Accessible Parking Enforcement",
+      "recommended_action": "Inspect per KSCDR Universal Accessibility Built Environment Guidelines and Saudi Highway Code standards. Disabled parking spaces must be clearly marked with designated road markings and official signage, positioned as close as possible to building entrances, with ramp-equipped sidewalks and adequate lighting. Faded or damaged markings must be repainted immediately. Unauthorized vehicles parked in disabled spaces are subject to Moroor fines of SAR 500–900 plus towing. Report violations to Moroor and ensure markings comply with current KSCDR standards."
+    },
+    {
+      "rule_id": "H09",
+      "object": "pedestrian_crossing",
+      "finding": "Pedestrian Crossing — Visibility or Compliance Failure",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Highway Code SHC 602 (Pavement Markings) | SHC 301 (Geometric Design) | MOMAH Sidewalks Design Manual | KSCDR Accessibility Guidelines",
+      "recommended_action": "Inspect per Saudi Highway Code SHC 602 and SHC 301. Pedestrian crossing markings must be clearly visible with retroreflective thermoplastic paint. In hospital and school zones, crossings require additional safety measures: speed limit of 30 km/h, elevated crosswalks or speed tables, high-visibility warning signs, and accessible curb ramps (minimum 1500mm width) per KSCDR guidelines. Faded or missing crosswalk markings must be repainted urgently. Drivers are legally required to stop completely for pedestrians at marked crossings — violations are enforced by Moroor."
+    },
+    {
+      "rule_id": "H10",
+      "object": "tactile_paving",
+      "finding": "Tactile Paving — Missing, Damaged, or Non-Compliant",
+      "severity": "MEDIUM",
+      "regulatory_reference": "KSCDR Universal Accessibility Built Environment Guidelines | Saudi Building Code (SBC) Accessibility Requirements | MOMAH Sidewalks Design Manual",
+      "recommended_action": "Inspect per KSCDR Universal Accessibility Built Environment Guidelines and Saudi Building Code (SBC) accessibility requirements. Tactile paving (textured guidance tiles) is mandatory at pedestrian crossings, building entrances, and high-risk pedestrian zones near hospitals and public facilities to assist visually impaired persons. Missing, damaged, or incorrectly installed tactile paving is a breach of national accessibility standards. Coordinate with the local municipality (Amanah) maintenance department to repair or install compliant tactile paving as per MOMAH Sidewalks Design Manual specifications."
+    },
+    {
+      "rule_id": "H11",
+      "object": "traffic_light",
+      "finding": "Traffic Signal — Malfunction, Damage, or Compliance Issue",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Highway Code SHC 602 (Traffic Control Devices) | MOMAH Urban Infrastructure Standards | Ministry of Transport and Logistic Services (MoTLS)",
+      "recommended_action": "Report immediately per Saudi Highway Code SHC 602 requirements. Traffic signals must be fully operational, correctly positioned, and compliant with SHC 602 specifications for signal timing, pedestrian push buttons, and audible alerts. Malfunctioning or damaged signals near hospitals require priority repair due to emergency vehicle preemption requirements. Contact the local Amanah (municipality) infrastructure department and Ministry of Transport and Logistic Services (MoTLS) for urgent repair. Temporarily deploy traffic officers or manual control until the signal is restored."
+    },
+    {
+      "rule_id": "H12",
+      "object": "emergency_exit_door",
+      "finding": "Emergency Exit — Obstruction or Non-Compliance",
+      "severity": "HIGH",
+      "regulatory_reference": "Saudi Building Code SBC 801 (Fire and Life Safety) | Saudi Civil Defense (SCD) Inspection Requirements | CBAHI Hospital Accreditation Standards",
+      "recommended_action": "Inspect per Saudi Building Code SBC 801 (Fire and Life Safety) and Saudi Civil Defense (SCD) requirements. Emergency exit doors must be unobstructed, clearly marked, illuminated, and fully operational at all times. Any object, vehicle, or construction blocking an emergency exit is a critical life safety violation subject to immediate Civil Defense enforcement action. Hospitals must maintain emergency exit compliance as a condition of CBAHI accreditation. Report obstruction immediately to the facility's safety officer and the local Civil Defense branch for urgent inspection and enforcement."
+    }
+  ]
+}

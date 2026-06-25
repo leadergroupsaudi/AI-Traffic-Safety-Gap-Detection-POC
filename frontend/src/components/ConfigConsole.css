@@ -1,0 +1,87 @@
+.config-console {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* Panel header */
+.config-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.config-panel-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--text-primary);
+}
+
+/* Guideline box */
+.guideline-box {
+  background: var(--blue-glow);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guideline-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.guideline-body {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.guideline-body strong {
+  color: var(--text-primary);
+}
+
+.spec-input {
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-mid);
+  border-radius: 7px;
+  padding: 9px 11px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.spec-input:focus { border-color: var(--blue); }
+
+.btn-add-spec {
+  width: 100%;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: 2px;
+}
+
+.btn-add-spec:hover  { background: var(--blue-dark); }
+.btn-add-spec:active { transform: scale(0.98); }

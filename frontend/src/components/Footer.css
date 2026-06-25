@@ -1,0 +1,33 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-header);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.irap-chip {
+  color: var(--blue);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.footer-dot {
+  color: var(--border-mid);
+}
+
+.footer-hospitals {
+  color: var(--text-secondary);
+}

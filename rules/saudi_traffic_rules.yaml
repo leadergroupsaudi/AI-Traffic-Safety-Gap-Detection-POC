@@ -1,0 +1,904 @@
+# ============================================================
+# Saudi Traffic Safety Rules Engine - Rule Configuration
+# ============================================================
+# Standards Referenced:
+#   SHC 602       — Saudi Highway Code / Saudi MUTCD equivalent
+#   SASO 2927     — Saudi Standard for LED Street Lighting (mandatory since Sept 2020)
+#   MOMAH         — Ministry of Municipal and Rural Affairs and Housing
+#   MOH Checklist — Saudi Ministry of Health Hospital Commissioning Checklist
+#   KSARAP/iRAP   — Kingdom of Saudi Arabia Road Assessment Programme
+#   Civil Defense — Saudi Civil Defense emergency access requirements
+#
+# Rule Status:
+#   enabled: true  — rule is active and will be evaluated
+#   enabled: false — rule is pending additional detection classes
+# ============================================================
+
+version: "1.0"
+last_updated: "2026-06-03"
+author: "AI Traffic Safety POC"
+
+# ── Global Config ────────────────────────────────────────────
+config:
+  # Minimum confidence to accept a detection as valid
+  min_confidence_threshold: 0.25
+
+  # Assumed vehicle speed for distance estimation (no GPS in POC)
+  vehicle_speed_kmh: 40.0
+
+  # Video frame rate (used for frame-to-time conversion)
+  fps: 30
+
+  # Risk score output range
+  score_min: 0
+  score_max: 100
+
+  # iRAP star mapping (1 = highest risk, 5 = safest)
+  irap_thresholds:
+    one_star:   75   # score >= 75
+    two_star:   50   # score >= 50
+    three_star: 25   # score >= 25
+    four_star:  10   # score >= 10
+    five_star:  0    # score < 10
+
+# ── Risk Score Multipliers ───────────────────────────────────
+scoring:
+  # Zone Criticality Multiplier (ZCM)
+  # Applied when a finding is near a critical asset class
+  zone_multipliers:
+    near_ambulance_entrance:   1.5   # within 100m
+    near_emergency_sign:       1.4   # within 100m
+    near_main_entrance:        1.3   # adjacent to main entrance
+    general_road:              1.0   # no critical context
+
+  # Compound Violation Factor (CVF)
+  # Applied when multiple rule violations exist in the same spatial zone
+  compound_factors:
+    violations_1: 1.0
+    violations_2: 1.2
+    violations_3: 1.4
+    violations_4_plus: 1.6
+
+  # Detection Confidence Factor (DCF)
+  # DCF = 0.5 + (trigger_confidence * 0.5)
+  # Dampens score when detection confidence is borderline
+  dcf_formula: "0.5 + (confidence * 0.5)"
+
+# ── Classification Thresholds ────────────────────────────────
+classification:
+  CRITICAL: 75   # Immediate intervention — escalate to municipal authority
+  HIGH:     50   # Urgent — remediate within 30 days (KSARAP)
+  MEDIUM:   25   # Schedule within 90 days
+  LOW:       0   # Log for next inspection cycle
+
+# ================================================================
+# RULES
+# ================================================================
+
+rules:
+
+  # ── R-07 ── ACTIVE ──────────────────────────────────────────
+  - id: R-07
+    name: "Street Light Spacing Violation"
+    description: >
+      Consecutive street light detections are separated by a gap exceeding
+      the SASO 2927:2019 maximum spacing for the road class. Indicates a
+      dark segment that does not meet minimum illuminance requirements.
+    standard: "SASO 2927:2019 (mandatory since September 2020)"
+    enabled: true
+    requires_classes:
+      - street_light
+    trigger_class: street_light
+    rule_type: spacing
+
+    parameters:
+      max_gap_meters: 40.0          # SASO 2927 ME-class road maximum spacing
+      confidence_threshold: 0.25    # minimum detection confidence
+      # Time equivalent at default speed (40 km/h):
+      # 40m / 11.11 m/s = 3.6 seconds
+      min_gap_seconds: 3.6
+
+    risk:
+      base_score: 35
+      priority: MEDIUM
+
+    recommended_action: >
+      Install additional street light. Gap exceeds SASO 2927:2019 maximum
+      40m spacing for collector/arterial roads. Verify pole height and lux
+      output meet ME-class illuminance requirements.
+
+  # ── R-08 ── PENDING ─────────────────────────────────────────
+  - id: R-08
+    name: "Dark Segment Near Emergency Access Zone"
+    description: >
+      A street light gap exists within 100m of an ambulance entrance or
+      emergency sign. The tighter 25m spacing requirement applies near
+      emergency corridors per Saudi Civil Defense access standards.
+    standard: "SASO 2927:2019 + Saudi Civil Defense Emergency Access Requirements"
+    enabled: false
+    requires_classes:
+      - street_light
+      - ambulance_entrance    # PENDING detection class
+      - emergency_sign        # PENDING detection class
+    trigger_class: street_light
+    context_classes:
+      - ambulance_entrance
+      - emergency_sign
+    rule_type: context_spacing
+
+    parameters:
+      max_gap_meters: 25.0           # Tighter threshold near emergency zones
+      emergency_zone_radius_meters: 100.0
+      confidence_threshold: 0.25
+      min_gap_seconds: 2.25          # 25m / 11.11 m/s
+
+    risk:
+      base_score: 60
+      priority: HIGH
+
+    recommended_action: >
+      Install street light immediately. Maximum 25m spacing required within
+      100m of emergency access zones (SASO 2927:2019 + Civil Defense mandate).
+      Emergency corridors must be lit 24/7 at minimum 30 lux.
+
+  # ── R-01 ── PENDING ─────────────────────────────────────────
+  - id: R-01
+    name: "Ambulance Entrance — Missing Advance Warning Signs"
+    description: >
+      An ambulance entrance is detected but no emergency sign exists within
+      100m upstream. SHC 602 requires a series of advance warning signs at
+      100m and 50m before every emergency access point.
+    standard: "SHC 602 (Saudi MUTCD) — Section 7: Emergency Facility Signage"
+    enabled: false
+    requires_classes:
+      - ambulance_entrance    # PENDING detection class
+      - emergency_sign        # PENDING detection class
+    trigger_class: ambulance_entrance
+    rule_type: co_presence
+
+    parameters:
+      requires_class: emergency_sign
+      direction: upstream
+      within_meters: 100.0
+      min_count: 1
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 65
+      priority: HIGH
+
+    recommended_action: >
+      Install emergency sign series at 100m and 50m upstream of ambulance
+      entrance per SHC 602. Signs must be bilingual (Arabic/English) with
+      white lettering on red background and retroreflective coating.
+
+  # ── R-02 ── PENDING ─────────────────────────────────────────
+  - id: R-02
+    name: "Ambulance Entrance — No Street Light"
+    description: >
+      An ambulance entrance is detected with no street light within 30m.
+      Saudi MOH Hospital Commissioning Checklist requires emergency entrances
+      to be accessible and illuminated 24 hours a day.
+    standard: "SASO 2927:2019 + Saudi MOH Hospital Commissioning Checklist"
+    enabled: false
+    requires_classes:
+      - ambulance_entrance    # PENDING detection class
+      - street_light
+    trigger_class: ambulance_entrance
+    rule_type: co_presence
+
+    parameters:
+      requires_class: street_light
+      within_meters: 30.0
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 65
+      priority: HIGH
+
+    recommended_action: >
+      Install minimum 30-lux street light at ambulance entrance. Emergency
+      access must be lit 24/7 per SASO 2927:2019 ME-class and MOH checklist.
+      Consider backup power supply for continuity during outages.
+
+  # ── R-03 ── PENDING ─────────────────────────────────────────
+  - id: R-03
+    name: "Orphaned Emergency Sign — No Ambulance Entrance Found"
+    description: >
+      An emergency sign is detected but no ambulance entrance exists within
+      200m downstream. An orphaned sign misleads emergency drivers and
+      indicates a removed or unreachable access point.
+    standard: "SHC 602 (Saudi MUTCD)"
+    enabled: false
+    requires_classes:
+      - emergency_sign        # PENDING detection class
+      - ambulance_entrance    # PENDING detection class
+    trigger_class: emergency_sign
+    rule_type: co_presence
+
+    parameters:
+      requires_class: ambulance_entrance
+      direction: downstream
+      within_meters: 200.0
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 35
+      priority: MEDIUM
+
+    recommended_action: >
+      Verify ambulance entrance exists within 200m. If not, remove or
+      relocate the orphaned sign. If entrance was removed, update
+      signage immediately to avoid misleading emergency responders.
+
+  # ── R-04 ── PENDING ─────────────────────────────────────────
+  - id: R-04
+    name: "Incomplete Emergency Sign Series"
+    description: >
+      An ambulance entrance is detected but fewer than 2 emergency signs
+      exist within 120m upstream. SHC 602 mandates a series of 3 signs:
+      at 100m, at 50m, and at the entrance itself.
+    standard: "SHC 602 (Saudi MUTCD) — Mandatory 3-sign warning series"
+    enabled: false
+    requires_classes:
+      - ambulance_entrance    # PENDING detection class
+      - emergency_sign        # PENDING detection class
+    trigger_class: ambulance_entrance
+    rule_type: co_presence
+
+    parameters:
+      requires_class: emergency_sign
+      direction: upstream
+      within_meters: 120.0
+      min_count: 2              # needs at least 2 (100m + 50m signs)
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 55
+      priority: MEDIUM
+
+    recommended_action: >
+      Complete the 3-sign series: place signs at 100m ahead, 50m ahead,
+      and at the entrance (SHC 602). All signs must be bilingual,
+      retroreflective, and minimum 600x600mm on primary roads.
+
+  # ── R-05 ── PENDING ─────────────────────────────────────────
+  - id: R-05
+    name: "Main Entrance — No Street Light"
+    description: >
+      A main entrance is detected with no street light within 50m.
+      MOMAH wayfinding regulations require main entrances to facilities
+      to be clearly visible and accessible at night.
+    standard: "SASO 2927:2019 + MOMAH Wayfinding Regulations"
+    enabled: false
+    requires_classes:
+      - main_entrance         # PENDING detection class
+      - street_light
+    trigger_class: main_entrance
+    rule_type: co_presence
+
+    parameters:
+      requires_class: street_light
+      within_meters: 50.0
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 40
+      priority: MEDIUM
+
+    recommended_action: >
+      Install street light within 50m of main entrance. Minimum S-class
+      illuminance per SASO 2927:2019 for pedestrian areas. Ensure
+      facility signage is also retroreflective or illuminated.
+
+  # ── R-06 ── PENDING ─────────────────────────────────────────
+  - id: R-06
+    name: "Hospital Main Entrance — No Emergency Sign"
+    description: >
+      A main entrance is detected within 200m of an ambulance entrance
+      but has no emergency sign directing patients to the emergency unit.
+      Saudi MOH Hospital Commissioning Checklist requires clear separation
+      and directional signage between main and emergency entrances.
+    standard: "Saudi MOH Hospital Commissioning Checklist + SHC 602"
+    enabled: false
+    requires_classes:
+      - main_entrance         # PENDING detection class
+      - emergency_sign        # PENDING detection class
+      - ambulance_entrance    # PENDING detection class
+    trigger_class: main_entrance
+    rule_type: context_co_presence
+
+    parameters:
+      context_class: ambulance_entrance
+      context_within_meters: 200.0
+      requires_class: emergency_sign
+      requires_within_meters: 50.0
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 45
+      priority: MEDIUM
+
+    recommended_action: >
+      Install directional emergency sign at main entrance pointing to
+      ambulance/emergency entrance. Sign must display "Emergency / طوارئ"
+      with directional arrow per MOH checklist and SHC 602 bilingual
+      requirements.
+
+
+# ================================================================
+# MIGRATED DIRECT DETECTION RULES (Layer 1)
+# ================================================================
+
+  # ── R-01 ── ACTIVE ──────────────────────────────────────────
+  - id: R-01
+    name: "Road Surface Defect — Pothole Detected"
+    description: >
+      Detected instance of potholes.
+    standard: "MOMAH General Specifications for Urban Roads Construction | Saudi Highway Code SHC | Roads General Authority (RGA) Maintenance Obligations"
+    enabled: true
+    requires_classes:
+      - potholes
+    trigger_class: potholes
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Report via the Balady platform (balady.gov.sa) under MOMAH General Specifications for Urban Roads Construction. The responsible municipality or contracted maintenance entity is legally obligated to inspect and repair the road surface defect. Unaddressed potholes causing vehicle damage or accidents may result in legal liability for the contractor or municipal authority under Saudi law. Commission immediate pavement assessment and schedule urgent repair works.
+
+  # ── R-02 ── ACTIVE ──────────────────────────────────────────
+  - id: R-02
+    name: "Missing Road Marking — Visibility Compliance Failure"
+    description: >
+      Detected instance of missing_road_marking.
+    standard: "Saudi Highway Code SHC 602 (Saudi MUTCD) | MOMAH Urban Roads Maintenance Obligations"
+    enabled: true
+    requires_classes:
+      - missing_road_marking
+    trigger_class: missing_road_marking
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per Saudi Highway Code SHC 602 (Saudi Manual on Uniform Traffic Control Devices). Road markings must be visible day and night and incorporate retroreflective properties using glass beads in thermoplastic or approved materials. MOMAH municipalities are responsible for rehabilitating faded or missing ground markings on urban roads. Schedule immediate repainting using compliant thermoplastic retroreflective material. Report via the Balady platform if within municipal jurisdiction.
+
+  # ── R-03 ── ACTIVE ──────────────────────────────────────────
+  - id: R-03
+    name: "Damaged Sidewalk — Pedestrian Safety Non-Compliance"
+    description: >
+      Detected instance of damaged_sidewalks.
+    standard: "MOMAH Sidewalks, Islands & Medians Design Manual | Saudi Building Code (SBC) Accessibility Requirements | Universal Accessibility: Built Environment Guidelines (KSCDR)"
+    enabled: true
+    requires_classes:
+      - damaged_sidewalks
+    trigger_class: damaged_sidewalks
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 25
+      priority: MEDIUM
+
+    recommended_action: >
+      Inspect per the MOMAH Sidewalks, Islands & Medians Design Manual. Sidewalks must comply with Universal Accessibility Built Environment Guidelines (issued by KSCDR) ensuring safe, unobstructed pedestrian passage with proper gradients, adequate widths, and curb cuts for persons with disabilities. Damaged sections must be repaired to restore structural integrity and accessibility compliance. Failure to maintain safe pedestrian pathways is a breach of MOMAH urban road maintenance obligations. Report via the Balady platform or the 940 municipal call center.
+
+  # ── R-04 ── ACTIVE ──────────────────────────────────────────
+  - id: R-04
+    name: "Construction Waste Obstruction on Public Road"
+    description: >
+      Detected instance of construction_waste.
+    standard: "MOMAH Requirements for Disposal of Construction, Demolition & Renovation Waste | MWAN (National Center for Waste Management) Regulations | Municipal Violations Penalty Regulations"
+    enabled: true
+    requires_classes:
+      - construction_waste
+    trigger_class: construction_waste
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Report under MOMAH Requirements for the Disposal of Construction, Demolition, and Renovation Waste. Dumping construction waste on public roads is a municipal violation carrying fines of up to SAR 50,000. Contractors are legally obligated to transport all waste to designated disposal sites using licensed vehicles. Non-removal of debris after completing works attracts additional fines of SAR 3,000–10,000. Coordinate with the municipality to issue a compliance notice to the responsible contractor and enforce immediate site clearance.
+
+  # ── R-05 ── ACTIVE ──────────────────────────────────────────
+  - id: R-05
+    name: "Waste Accumulation on Public Road or Pavement"
+    description: >
+      Detected instance of waste_accumulation.
+    standard: "MOMAH Waste Management Law | Municipal Violations Penalty Regulations | Balady Platform Enforcement"
+    enabled: true
+    requires_classes:
+      - waste_accumulation
+    trigger_class: waste_accumulation
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 0
+      priority: LOW
+
+    recommended_action: >
+      Report under the MOMAH Waste Management Law and Municipal Violations Penalty Regulations. Improper waste disposal and littering on public roads or pavements carries fines of SAR 200–1,000 per incident, with escalating penalties for repeat violations. Schedule a municipal cleaning operation and issue compliance notices to responsible parties. Municipalities have authority to disconnect utility services for sites failing to correct major violations. Report via the Balady platform or Mumtathil enforcement portal.
+
+  # ── R-06 ── ACTIVE ──────────────────────────────────────────
+  - id: R-06
+    name: "Damaged or Abandoned Vehicle — Road Obstruction"
+    description: >
+      Detected instance of damaged_vehicle_on_road.
+    standard: "MOMAH Municipal Regulations on Abandoned Vehicles | Saudi Traffic Law (Moroor) | Absher Platform Enforcement"
+    enabled: true
+    requires_classes:
+      - damaged_vehicle_on_road
+    trigger_class: damaged_vehicle_on_road
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Report per MOMAH municipal regulations on abandoned vehicles. Vehicles left on public roads for more than seven days are subject to impoundment by municipal or traffic authorities (Moroor). Owner is notified via Absher platform. If the vehicle is causing active road obstruction or safety hazard, contact Moroor (911) for immediate removal. Vehicle owner is liable for towing and storage fees plus applicable traffic violation fines. Ensure the scene is marked with warning signs until the obstruction is cleared.
+
+  # ── R-07 ── ACTIVE ──────────────────────────────────────────
+  - id: R-07
+    name: "Excavation Work Zone — Safety Non-Compliance"
+    description: >
+      Detected instance of safety_and_excavation_works.
+    standard: "MOMAH Traffic Control at Work Sites Guide | MOMAH Comprehensive Regulatory Guide for Civil Infrastructure Works | Balady Platform Excavation Permit Requirements"
+    enabled: true
+    requires_classes:
+      - safety_and_excavation_works
+    trigger_class: safety_and_excavation_works
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per the MOMAH Traffic Control at Work Sites Guide and Comprehensive Regulatory Guide for Civil Infrastructure Works. All excavation works on public roads require a permit issued via the Balady platform, including a site safety plan and traffic management plan. Mandatory safety requirements: barricades with reflective strips and warning lights around the full work zone, adequate pedestrian detour if sidewalk is blocked, and shoring for excavations deeper than 1.5 metres. Materials must be kept at least 1 metre from the excavation edge. Non-compliant sites must be reported to the local municipality (Amanah) infrastructure coordination office for immediate enforcement action.
+
+  # ── R-08 ── ACTIVE ──────────────────────────────────────────
+  - id: R-08
+    name: "Unauthorized Speed Hump Detected"
+    description: >
+      Detected instance of random_bumps.
+    standard: "SASO GSO 2084:2010 | Saudi Highway Code SHC 602"
+    enabled: true
+    requires_classes:
+      - random_bumps
+    trigger_class: random_bumps
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 25
+      priority: MEDIUM
+
+    recommended_action: >
+      Verify compliance with SASO GSO 2084:2010. Speed humps require an engineering study and formal municipal approval via the Balady platform per Saudi Highway Code SHC 602. Speed humps installed without approval must be removed. Ensure warning signs and reflective markings are in place if the hump is authorized.
+
+  # ── R-09 ── ACTIVE ──────────────────────────────────────────
+  - id: R-09
+    name: "Manhole Cover Infrastructure Issue"
+    description: >
+      Detected instance of manholes.
+    standard: "MOMAH General Specifications for Urban Roads Construction | Saudi Highway Code SHC"
+    enabled: true
+    requires_classes:
+      - manholes
+    trigger_class: manholes
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per MOMAH General Specifications for Urban Roads Construction. Manhole covers must be flush with the pavement surface — protruding or sunken covers are classified as significant road hazards. Covers must have anti-slip properties and withstand applicable traffic load categories. Report to the relevant utility authority for immediate inspection and rectification.
+
+  # ── R-10 ── ACTIVE ──────────────────────────────────────────
+  - id: R-10
+    name: "Unauthorized Graffiti on Public Infrastructure"
+    description: >
+      Detected instance of graffitti.
+    standard: "MOMAH Municipal Violations Penalty Regulations | Ministry of Interior Public Decency Regulations"
+    enabled: true
+    requires_classes:
+      - graffitti
+    trigger_class: graffitti
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 0
+      priority: LOW
+
+    recommended_action: >
+      Report under MOMAH Municipal Violations Penalty Regulations. Unauthorized graffiti on public property is a violation carrying fines of SAR 500–1,000 (doubled for repeat offenses). Coordinate with the municipality for surface cleaning and restoration. Violators are liable for full restoration costs in addition to the fine.
+
+  # ── R-11 ── ACTIVE ──────────────────────────────────────────
+  - id: R-11
+    name: "Damaged Commercial Signage — Municipal Compliance Violation"
+    description: >
+      Detected instance of damaged_commercial_stores_signage.
+    standard: "MOMAH Regulatory Guide for Commercial Signage (Balady Platform)"
+    enabled: true
+    requires_classes:
+      - damaged_commercial_stores_signage
+    trigger_class: damaged_commercial_stores_signage
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 0
+      priority: LOW
+
+    recommended_action: >
+      Report under the MOMAH Regulatory Guide for Commercial Signage. Business owners are legally required to maintain commercial signage in good condition and remove any expired or damaged signs immediately. Notify the commercial property owner to repair or remove the damaged signage. Non-compliance may result in municipal penalties enforced via the Balady platform.
+
+  # ── R-12 ── ACTIVE ──────────────────────────────────────────
+  - id: R-12
+    name: "Public Place Cleanliness Violation"
+    description: >
+      Detected instance of cleanliness_of_public_places.
+    standard: "MOMAH Waste Management Law | Municipal Violations Penalty Regulations"
+    enabled: true
+    requires_classes:
+      - cleanliness_of_public_places
+    trigger_class: cleanliness_of_public_places
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 0
+      priority: LOW
+
+    recommended_action: >
+      Report under the MOMAH Waste Management Law and Municipal Violations Penalty Regulations. Littering and improper waste disposal in public places carry fines of SAR 200–1,000 per incident. Schedule a municipal cleaning operation and issue compliance notice to responsible parties. Repeat violations attract escalating penalties.
+
+  # ── R-13 ── ACTIVE ──────────────────────────────────────────
+  - id: R-13
+    name: "Construction Site Safety Non-Compliance"
+    description: >
+      Detected instance of buildings_under_construction.
+    standard: "MOMAH Guide for Fencing Construction Sites | MOMAH Covering Buildings Under Construction Guidelines"
+    enabled: true
+    requires_classes:
+      - buildings_under_construction
+    trigger_class: buildings_under_construction
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per the MOMAH Guide for Fencing Construction Sites. Mandatory requirements include: proper hoarding or fencing around the full perimeter, high-visibility reflective warning and directional signage, and an alternative safe pedestrian path if the sidewalk is blocked. Violations can result in financial penalties and suspension of the project license. Report to the local municipality (Amanah) for enforcement action.
+
+  # ── R-14 ── ACTIVE ──────────────────────────────────────────
+  - id: R-14
+    name: "Curbstone Marking Condition Issue"
+    description: >
+      Detected instance of painting_of_curbstone.
+    standard: "MOMAH General Specifications Guide for Road Construction and Structures | Saudi Highway Code SHC"
+    enabled: true
+    requires_classes:
+      - painting_of_curbstone
+    trigger_class: painting_of_curbstone
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 0
+      priority: LOW
+
+    recommended_action: >
+      Inspect per the MOMAH General Specifications Guide for Road Construction. Curbstone markings must be weather-resistant, durable under Saudi climatic conditions, and retroreflective using glass beads for night visibility. Faded, chipped, or missing curbstone paint must be repainted to restore road boundary clarity and traffic safety. Coordinate with the local municipality maintenance department for repainting works.
+
+  # ── H-01 ── PENDING ──────────────────────────────────────────
+  - id: H-01
+    name: "Fire Hydrant Access Obstruction Risk"
+    description: >
+      Detected instance of fire_hydrant.
+    standard: "Saudi Building Code SBC 801 (Fire Protection) | Saudi Civil Defense (SCD) Regulations | MOMAH Urban Infrastructure Standards"
+    enabled: false
+    requires_classes:
+      - fire_hydrant
+    trigger_class: fire_hydrant
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per Saudi Building Code SBC 801 and Saudi Civil Defense (SCD) regulations. Fire hydrants must be completely unobstructed on all sides to allow immediate emergency crew access. Any vehicle, construction material, landscaping, or debris blocking hydrant access is a serious violation. Facilities must conduct regular inspections and maintain documentation per SCD requirements. Failure to maintain clear hydrant access can result in failed Civil Defense inspections and denial of operational licenses. Report obstruction immediately to the local Civil Defense branch and the responsible municipality.
+
+  # ── H-02 ── PENDING ──────────────────────────────────────────
+  - id: H-02
+    name: "Emergency Directional Signage — Compliance Issue"
+    description: >
+      Detected instance of emergency_sign.
+    standard: "Saudi Highway Code SHC 602 — Emergency Facilities Signage (G11-Series) | MOMAH Urban Road Standards"
+    enabled: false
+    requires_classes:
+      - emergency_sign
+    trigger_class: emergency_sign
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per Saudi Highway Code SHC 602 Emergency Facilities Signage standards (G11-Series). Emergency directional signs for hospitals and critical facilities must be clearly visible, properly positioned, retroreflective, and free from obstruction or damage. Faded, missing, or obstructed emergency signs can delay emergency response and endanger lives. Coordinate with the local Amanah (municipality) to repair, replace, or re-position non-compliant signs as per SHC 602 specifications.
+
+  # ── H-03 ── PENDING ──────────────────────────────────────────
+  - id: H-03
+    name: "Ambulance Entrance — Access Obstruction or Non-Compliance"
+    description: >
+      Detected instance of ambulance_entrance.
+    standard: "Saudi Building Code (SBC) Site Planning Requirements | CBAHI Hospital Accreditation Standards | MOMAH Urban Planning Guidelines | Saudi Red Crescent Authority (SRCA) Coordination Requirements"
+    enabled: false
+    requires_classes:
+      - ambulance_entrance
+    trigger_class: ambulance_entrance
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per Saudi Building Code (SBC) site planning requirements and CBAHI hospital accreditation standards. Hospitals are required to maintain a dedicated, clearly marked, and permanently unobstructed ambulance entrance separate from general public access. Any vehicle, object, or construction blocking this access point must be removed immediately. Coordinate with Moroor (traffic authorities) if unauthorized vehicles are present. Non-compliance risks hospital accreditation failure. Contact SRCA (997) and local Civil Defense for emergency coordination if access is critically compromised.
+
+  # ── H-04 ── PENDING ──────────────────────────────────────────
+  - id: H-04
+    name: "Hospital Main Entrance — Access or Safety Non-Compliance"
+    description: >
+      Detected instance of main_entrance.
+    standard: "Saudi Building Code (SBC) Accessibility Requirements | KSCDR Universal Accessibility Built Environment Guidelines | MOMAH Urban Planning Guidelines"
+    enabled: false
+    requires_classes:
+      - main_entrance
+    trigger_class: main_entrance
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 25
+      priority: MEDIUM
+
+    recommended_action: >
+      Inspect per Saudi Building Code (SBC) and KSCDR Universal Accessibility Built Environment Guidelines. Hospital main entrances must be clearly identified, fully accessible to persons with disabilities (proper ramps, curb cuts, minimum 1500mm clearance width), and free from obstructions. Sidewalks and paths approaching the main entrance must comply with MOMAH Sidewalks Design Manual. Report non-compliance to the local municipality and the Ministry of Human Resources and Social Development (HRSD) if accessibility standards are violated.
+
+  # ── H-05 ── PENDING ──────────────────────────────────────────
+  - id: H-05
+    name: "Illegal Parking in Restricted Zone"
+    description: >
+      Detected instance of illegal_parking.
+    standard: "Saudi Traffic Law (Moroor) | MOMAH Municipal Parking Regulations | Absher Platform Enforcement"
+    enabled: false
+    requires_classes:
+      - illegal_parking
+    trigger_class: illegal_parking
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Report to Moroor (General Directorate of Traffic) under Saudi Traffic Law. Parking in restricted zones (emergency vehicle areas, no-parking zones, hospital entrances) carries fines of SAR 150–900 plus vehicle towing and impoundment. Parking that blocks ambulance access or emergency routes is treated as a serious violation. Contact Moroor via 911 or the Moroor app. Violations are increasingly captured by AI-powered cameras and enforced automatically through the Absher platform.
+
+  # ── H-06 ── PENDING ──────────────────────────────────────────
+  - id: H-06
+    name: "Ambulance Bay Obstruction Detected"
+    description: >
+      Detected instance of ambulance_bay.
+    standard: "Saudi Traffic Law (Moroor) — Emergency Zone Parking | CBAHI Hospital Accreditation Standards | Saudi Building Code (SBC)"
+    enabled: false
+    requires_classes:
+      - ambulance_bay
+    trigger_class: ambulance_bay
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Report immediately to Moroor and hospital security. Parking in an ambulance bay is a serious traffic violation under Saudi Traffic Law, carrying fines up to SAR 900 plus mandatory towing. Ambulance bays must remain permanently clear to ensure emergency vehicle maneuverability per CBAHI hospital accreditation requirements and Saudi Building Code site planning standards. If a vehicle is obstructing the bay, contact Moroor (911) for immediate removal. Failure to maintain clear ambulance bays can jeopardize hospital accreditation status.
+
+  # ── H-07 ── PENDING ──────────────────────────────────────────
+  - id: H-07
+    name: "Ambulance Vehicle Obstruction or Access Denial"
+    description: >
+      Detected instance of ambulance_vehicle.
+    standard: "Saudi Traffic Law — Failure to Yield to Emergency Vehicles | SRCA (Saudi Red Crescent Authority) Operational Requirements"
+    enabled: false
+    requires_classes:
+      - ambulance_vehicle
+    trigger_class: ambulance_vehicle
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Under Saudi Traffic Law, all road users must immediately yield to ambulances on the road. Failure to yield to an emergency vehicle carries fines of SAR 1,000–2,000 and is monitored by automated AI camera systems. If an ambulance vehicle is being obstructed or unable to access a location, contact Moroor (911) and SRCA (997) immediately. Ensure all road markings, access routes, and emergency lanes near the hospital are clear and compliant with SHC 602 standards to prevent recurring obstruction incidents.
+
+  # ── H-08 ── PENDING ──────────────────────────────────────────
+  - id: H-08
+    name: "Disabled Parking Marking — Compliance or Obstruction Issue"
+    description: >
+      Detected instance of disabled_parking_ground_marking.
+    standard: "KSCDR Universal Accessibility Built Environment Guidelines | Saudi Highway Code (SHC) | Moroor Traffic Law — Accessible Parking Enforcement"
+    enabled: false
+    requires_classes:
+      - disabled_parking_ground_marking
+    trigger_class: disabled_parking_ground_marking
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 25
+      priority: MEDIUM
+
+    recommended_action: >
+      Inspect per KSCDR Universal Accessibility Built Environment Guidelines and Saudi Highway Code standards. Disabled parking spaces must be clearly marked with designated road markings and official signage, positioned as close as possible to building entrances, with ramp-equipped sidewalks and adequate lighting. Faded or damaged markings must be repainted immediately. Unauthorized vehicles parked in disabled spaces are subject to Moroor fines of SAR 500–900 plus towing. Report violations to Moroor and ensure markings comply with current KSCDR standards.
+
+  # ── H-09 ── PENDING ──────────────────────────────────────────
+  - id: H-09
+    name: "Pedestrian Crossing — Visibility or Compliance Failure"
+    description: >
+      Detected instance of pedestrian_crossing.
+    standard: "Saudi Highway Code SHC 602 (Pavement Markings) | SHC 301 (Geometric Design) | MOMAH Sidewalks Design Manual | KSCDR Accessibility Guidelines"
+    enabled: false
+    requires_classes:
+      - pedestrian_crossing
+    trigger_class: pedestrian_crossing
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per Saudi Highway Code SHC 602 and SHC 301. Pedestrian crossing markings must be clearly visible with retroreflective thermoplastic paint. In hospital and school zones, crossings require additional safety measures: speed limit of 30 km/h, elevated crosswalks or speed tables, high-visibility warning signs, and accessible curb ramps (minimum 1500mm width) per KSCDR guidelines. Faded or missing crosswalk markings must be repainted urgently. Drivers are legally required to stop completely for pedestrians at marked crossings — violations are enforced by Moroor.
+
+  # ── H-10 ── PENDING ──────────────────────────────────────────
+  - id: H-10
+    name: "Tactile Paving — Missing, Damaged, or Non-Compliant"
+    description: >
+      Detected instance of tactile_paving.
+    standard: "KSCDR Universal Accessibility Built Environment Guidelines | Saudi Building Code (SBC) Accessibility Requirements | MOMAH Sidewalks Design Manual"
+    enabled: false
+    requires_classes:
+      - tactile_paving
+    trigger_class: tactile_paving
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 25
+      priority: MEDIUM
+
+    recommended_action: >
+      Inspect per KSCDR Universal Accessibility Built Environment Guidelines and Saudi Building Code (SBC) accessibility requirements. Tactile paving (textured guidance tiles) is mandatory at pedestrian crossings, building entrances, and high-risk pedestrian zones near hospitals and public facilities to assist visually impaired persons. Missing, damaged, or incorrectly installed tactile paving is a breach of national accessibility standards. Coordinate with the local municipality (Amanah) maintenance department to repair or install compliant tactile paving as per MOMAH Sidewalks Design Manual specifications.
+
+  # ── H-11 ── PENDING ──────────────────────────────────────────
+  - id: H-11
+    name: "Traffic Signal — Malfunction, Damage, or Compliance Issue"
+    description: >
+      Detected instance of traffic_light.
+    standard: "Saudi Highway Code SHC 602 (Traffic Control Devices) | MOMAH Urban Infrastructure Standards | Ministry of Transport and Logistic Services (MoTLS)"
+    enabled: false
+    requires_classes:
+      - traffic_light
+    trigger_class: traffic_light
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Report immediately per Saudi Highway Code SHC 602 requirements. Traffic signals must be fully operational, correctly positioned, and compliant with SHC 602 specifications for signal timing, pedestrian push buttons, and audible alerts. Malfunctioning or damaged signals near hospitals require priority repair due to emergency vehicle preemption requirements. Contact the local Amanah (municipality) infrastructure department and Ministry of Transport and Logistic Services (MoTLS) for urgent repair. Temporarily deploy traffic officers or manual control until the signal is restored.
+
+  # ── H-12 ── PENDING ──────────────────────────────────────────
+  - id: H-12
+    name: "Emergency Exit — Obstruction or Non-Compliance"
+    description: >
+      Detected instance of emergency_exit_door.
+    standard: "Saudi Building Code SBC 801 (Fire and Life Safety) | Saudi Civil Defense (SCD) Inspection Requirements | CBAHI Hospital Accreditation Standards"
+    enabled: false
+    requires_classes:
+      - emergency_exit_door
+    trigger_class: emergency_exit_door
+    rule_type: direct_detection
+
+    parameters:
+      confidence_threshold: 0.25
+
+    risk:
+      base_score: 50
+      priority: HIGH
+
+    recommended_action: >
+      Inspect per Saudi Building Code SBC 801 (Fire and Life Safety) and Saudi Civil Defense (SCD) requirements. Emergency exit doors must be unobstructed, clearly marked, illuminated, and fully operational at all times. Any object, vehicle, or construction blocking an emergency exit is a critical life safety violation subject to immediate Civil Defense enforcement action. Hospitals must maintain emergency exit compliance as a condition of CBAHI accreditation. Report obstruction immediately to the facility's safety officer and the local Civil Defense branch for urgent inspection and enforcement.
+
