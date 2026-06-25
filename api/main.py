@@ -55,6 +55,11 @@ class StatusUpdateRequest(BaseModel):
 
 # Phase 3: Endpoints
 
+@app.get("/health", summary="Health check")
+def health_check():
+    return {"status": "ok", "service": "ai-traffic-safety-api"}
+
+
 @app.get("/api/findings", summary="Get all findings")
 def get_findings(status: Optional[str] = None, zone: Optional[str] = None):
     """

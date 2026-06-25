@@ -1,0 +1,72 @@
+version: '3.9'
+
+# ─────────────────────────────────────────────────────────────
+# AI Traffic Safety — Docker Compose
+#
+# Usage:
+#   docker compose up -d            # start
+#   docker compose down             # stop
+#   docker compose logs -f          # tail logs
+#   docker compose ps               # health status
+#
+# Host Nginx proxy targets:
+#   Frontend → http://127.0.0.1:5173
+#   Backend  → http://127.0.0.1:8000
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Backend (FastAPI) ──────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    image: ai-traffic-safety-backend:latest
+    container_name: ai-traffic-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Bind-mount data directories so files persist on the host
+      - ./data/exports:/app/data/exports
+      - ./data/raw:/app/data/raw
+      - ./snapshots:/app/snapshots
+      - ./media:/app/media
+      - ./rules:/app/rules:ro          # rules YAML is read-only
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app-network
+
+  # ── Frontend (React + nginx) ───────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    image: ai-traffic-safety-frontend:latest
+    container_name: ai-traffic-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:8080"          # host:container  (nginx listens on 8080 inside)
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app-network
+
+# ── Internal network ────────────────────────────────────────
+networks:
+  app-network:
+    driver: bridge

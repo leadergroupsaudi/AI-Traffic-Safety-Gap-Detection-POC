@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+venv/
+.venv/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# ML model files (large — mount via volume instead)
+*.pt
+*.pth
+*.onnx
+*.weights
+
+# Data checkpoints
+data/raw/*_checkpoint*
+checkpoint.json
+checkpoint_tracking.xlsx
+
+# Environment secrets
+.env
+.env.production
+
+# Editor / OS
+.~lock.*
+.DS_Store
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docs (not needed in images)
+docs/
+
+# Test files
+tests/
