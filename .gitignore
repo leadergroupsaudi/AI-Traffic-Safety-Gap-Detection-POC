@@ -1,5 +1,6 @@
 .env
 .mcp.json
+.~lock.*
 
 node_modules/
 frontend/node_modules/
@@ -8,7 +9,6 @@ media/uploads/
 *.mp4
 
 snapshots/
-exports/
 findings/
 
 __pycache__/
