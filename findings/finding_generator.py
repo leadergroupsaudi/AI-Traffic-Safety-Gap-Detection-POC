@@ -2,16 +2,14 @@
 
 import os
 from openai import OpenAI
-from dotenv import load_dotenv
-
-load_dotenv()  # Reads .env file into environment
+from config.settings import OPENAI_API_KEY, OPENAI_MODEL
 
 
 class RecommendationGenerator:
 
     def __init__(self):
-        self.api_key = os.environ.get("OPENAI_API_KEY", "")
-        self.model   = os.environ.get("OPENAI_MODEL", "gpt-4o")
+        self.api_key = OPENAI_API_KEY
+        self.model   = OPENAI_MODEL
 
         if not self.api_key:
             print("[WARNING] OPENAI_API_KEY not set in .env — AI recommendations will be skipped.")

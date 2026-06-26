@@ -14,13 +14,7 @@ import cv2
 import pandas as pd
 import os
 
-# ─────────────────────────────────────────────
-# CONFIG — edit these paths if needed
-# ─────────────────────────────────────────────
-MODEL_PATH   = "/home/user/Downloads/Model.pt"
-VIDEO_PATH   = "/home/user/Desktop/AI Traffic Safety/Sample_full_video.mp4"
-FINDINGS_CSV = "data/exports/findings.csv"
-SNAPSHOTS_DIR = "snapshots"
+from config.settings import MODEL_PATH, VIDEO_PATH, FINDINGS_CSV, SNAPSHOTS_DIR
 
 # How many seconds to scan either side of evidence_timestamp
 # if YOLO doesn't find the object at the exact frame.

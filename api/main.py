@@ -7,9 +7,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import pandas as pd
 
-# Paths
-FINDINGS_CSV = "data/exports/findings.csv"
-SNAPSHOTS_DIR = "snapshots"
+from config.settings import (
+    FINDINGS_CSV,
+    SNAPSHOTS_DIR,
+    MEDIA_DIR,
+    UPLOAD_DIR,
+    TRACKING_XLSX,
+    RULES_YAML,
+)
 
 # Only these four detection classes are surfaced across all endpoints
 ALLOWED_CLASSES = {'street_light', 'manholes', 'emergency_sign', 'ambulance_entrance'}
@@ -30,7 +35,6 @@ app.add_middleware(
 )
 
 # Mount static directories
-MEDIA_DIR = "media"
 os.makedirs(SNAPSHOTS_DIR, exist_ok=True)
 os.makedirs(MEDIA_DIR, exist_ok=True)
 app.mount("/snapshots", StaticFiles(directory=SNAPSHOTS_DIR), name="snapshots")
@@ -84,11 +88,7 @@ def get_findings(status: Optional[str] = None, zone: Optional[str] = None):
     return df.to_dict(orient="records")
 
 
-TRACKING_XLSX = "data/raw/unique_objects_tracking_old.xlsx"
 FPS = 30
-
-
-UPLOAD_DIR = "media/uploads"
 
 
 @app.post("/api/upload", summary="Upload a video file")
@@ -161,7 +161,7 @@ def get_stats(zone: Optional[str] = None):
 def get_rules(zone: Optional[str] = None):
     import yaml
 
-    YAML_PATH = "rules/saudi_traffic_rules.yaml"
+    YAML_PATH = RULES_YAML
 
     yaml_rules = []
     try:
