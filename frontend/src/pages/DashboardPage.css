@@ -56,12 +56,251 @@
 }
 
 .hero-flaws-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   color: #64748b;
   margin-bottom: 4px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+/* ─── Posture info button ─────────────────────────── */
+.posture-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #334155;
+  background: #1c2a40;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.posture-info-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: rgba(59,130,246,0.1);
+}
+
+/* ─── Posture info modal ──────────────────────────── */
+.posture-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.posture-modal {
+  background: #111c2d;
+  border: 1px solid #1e3a5f;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+}
+
+.posture-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #1e3a5f;
+}
+
+.posture-modal-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.posture-modal-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.posture-modal-close:hover { color: var(--text-primary); }
+
+.posture-modal-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Final formula block */
+.posture-formula-block {
+  background: rgba(59,130,246,0.06);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.posture-formula-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.posture-formula {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 4px;
+}
+
+.posture-formula-live {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+/* Step list */
+.posture-step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.posture-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.posture-step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(59,130,246,0.15);
+  border: 1px solid rgba(59,130,246,0.35);
+  color: #3b82f6;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.posture-step-body { flex: 1; }
+
+.posture-step-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.posture-step-formula {
+  font-size: 11.5px;
+  font-family: 'Courier New', monospace;
+  color: #93c5fd;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  padding: 5px 9px;
+  margin-bottom: 8px;
+}
+
+.posture-step-live {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Factor grid */
+.posture-factor-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pf-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 12px;
+}
+
+.pf-key {
+  flex-shrink: 0;
+  width: 34px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: #f59e0b;
+  font-size: 11px;
+}
+
+.pf-desc {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.pf-desc code {
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 11px;
+  color: #93c5fd;
+}
+
+/* Thresholds */
+.posture-thresholds {
+  border-top: 1px solid #1e3a5f;
+  padding-top: 14px;
+}
+
+.posture-thresh-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.posture-thresh-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.pt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pt-band {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
 }
 
 .hero-flaws-count {

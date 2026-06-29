@@ -46,7 +46,7 @@ const PRIORITY_COLOR = {
   CRITICAL: '#f97316',
 }
 
-export default function RulesMatrix({ rules, setRules, totalFindings, roleState, zoneFocus }) {
+export default function RulesMatrix({ rules, setRules, totalFindings, roleState, zoneFocus, hasScanned }) {
   const isAdmin = roleState === 'admin'
   const [showModal, setShowModal] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
@@ -93,7 +93,9 @@ export default function RulesMatrix({ rules, setRules, totalFindings, roleState,
           </h2>
           <p className="matrix-subtitle">
             {zoneFocus && <span className="matrix-zone-badge">🏥 {zoneFocus}</span>}
-            Coverage rates are calculated from {totalFindings} road inspection findings processed by AI
+            {hasScanned
+              ? `Coverage rates are calculated from ${totalFindings} road inspection findings processed by AI`
+              : 'Upload a video and run AI scan to activate detection & coverage data'}
           </p>
         </div>
         <div className="matrix-header-actions">
@@ -167,35 +169,40 @@ export default function RulesMatrix({ rules, setRules, totalFindings, roleState,
 
                 {/* Detections */}
                 <td className="td-detections">
-                  {rule.detections > 0
-                    ? (
-                      <span className="detection-badge">
-                        <span
-                          className="det-dot"
-                          style={{ background: PRIORITY_COLOR[rule.priority] || 'var(--red)' }}
-                        />
-                        {rule.detections} active
-                      </span>
-                    )
-                    : <span className="no-detection">—</span>
+                  {!hasScanned
+                    ? <span className="col-locked"><ScanLockIcon /> Awaiting scan</span>
+                    : rule.detections > 0
+                      ? (
+                        <span className="detection-badge">
+                          <span
+                            className="det-dot"
+                            style={{ background: PRIORITY_COLOR[rule.priority] || 'var(--red)' }}
+                          />
+                          {rule.detections} active
+                        </span>
+                      )
+                      : <span className="no-detection">—</span>
                   }
                 </td>
 
                 {/* Coverage */}
                 <td className="td-coverage">
-                  {rule.enabled ? (
-                    <div className="coverage-wrap">
-                      <span className="coverage-pct">{rule.coverage_pct}%</span>
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{ width: `${rule.coverage_pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="no-detection">—</span>
-                  )}
+                  {!hasScanned
+                    ? <span className="col-locked"><ScanLockIcon /> Awaiting scan</span>
+                    : rule.enabled
+                      ? (
+                        <div className="coverage-wrap">
+                          <span className="coverage-pct">{rule.coverage_pct}%</span>
+                          <div className="progress-bar">
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${rule.coverage_pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      )
+                      : <span className="no-detection">—</span>
+                  }
                 </td>
 
                 {/* Edit tools */}
@@ -321,6 +328,15 @@ function RuleModal({ initial, onSave, onClose }) {
 function LockIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  )
+}
+
+function ScanLockIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>

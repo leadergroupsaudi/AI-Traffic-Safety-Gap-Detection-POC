@@ -162,12 +162,80 @@ function DashError() {
   )
 }
 
+/* ─── Posture Info Modal ──────────────────────────── */
+function PostureInfoModal({ compliance, avgRiskScore, totalFindings, onClose }) {
+  return (
+    <div className="posture-modal-overlay" onClick={onClose}>
+      <div className="posture-modal" onClick={e => e.stopPropagation()}>
+        <div className="posture-modal-header">
+          <span className="posture-modal-title">How is Compliance Posture % Calculated?</span>
+          <button className="posture-modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="posture-modal-body">
+
+          <div className="posture-formula-block">
+            <div className="posture-formula-label">FINAL FORMULA</div>
+            <div className="posture-formula">Posture % = 100 − avg_risk_score</div>
+            <div className="posture-formula-live">
+              = 100 − {avgRiskScore.toFixed(2)} = <strong style={{ color: '#3b82f6' }}>{compliance}%</strong>
+            </div>
+          </div>
+
+          <div className="posture-step-list">
+            <div className="posture-step">
+              <div className="posture-step-num">1</div>
+              <div className="posture-step-body">
+                <div className="posture-step-title">Per-Finding Risk Score</div>
+                <div className="posture-step-formula">risk_score = BRS × DCF × ZCM × CVF &nbsp;(clamped 0–100)</div>
+                <div className="posture-factor-grid">
+                  <div className="pf-row"><span className="pf-key">BRS</span><span className="pf-desc">Base Risk Score — from the rule definition (0–100)</span></div>
+                  <div className="pf-row"><span className="pf-key">DCF</span><span className="pf-desc">Detection Confidence Factor — <code>0.5 + (confidence × 0.5)</code>, dampens low-confidence hits</span></div>
+                  <div className="pf-row"><span className="pf-key">ZCM</span><span className="pf-desc">Zone Criticality Multiplier — higher near ambulance entrance / emergency sign</span></div>
+                  <div className="pf-row"><span className="pf-key">CVF</span><span className="pf-desc">Compound Violation Factor — increases when multiple violations cluster in the same ~100 m zone</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="posture-step">
+              <div className="posture-step-num">2</div>
+              <div className="posture-step-body">
+                <div className="posture-step-title">Average Risk Score across All Findings</div>
+                <div className="posture-step-formula">avg_risk_score = mean(risk_score) over {totalFindings} findings</div>
+                <div className="posture-step-live">Current value: <strong>{avgRiskScore.toFixed(2)}</strong> / 100</div>
+              </div>
+            </div>
+
+            <div className="posture-step">
+              <div className="posture-step-num">3</div>
+              <div className="posture-step-body">
+                <div className="posture-step-title">Compliance Posture %</div>
+                <div className="posture-step-formula">posture = 100 − avg_risk_score</div>
+                <div className="posture-step-live">100 − {avgRiskScore.toFixed(2)} = <strong>{compliance}%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="posture-thresholds">
+            <div className="posture-thresh-label">POSTURE BANDS</div>
+            <div className="posture-thresh-row"><span className="pt-dot" style={{ background: '#22c55e' }} /><span>≥ 90%</span><span className="pt-band">OPTIMAL</span></div>
+            <div className="posture-thresh-row"><span className="pt-dot" style={{ background: '#3b82f6' }} /><span>75–89%</span><span className="pt-band">GOOD STANDING</span></div>
+            <div className="posture-thresh-row"><span className="pt-dot" style={{ background: '#f59e0b' }} /><span>50–74%</span><span className="pt-band">MODERATE RISKS</span></div>
+            <div className="posture-thresh-row"><span className="pt-dot" style={{ background: '#ef4444' }} /><span>0–49%</span><span className="pt-band">HIGH RISK</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Main Page ───────────────────────────────────── */
 export default function DashboardPage({ zoneFocus, hasScanned, setActiveTab }) {
   const [apiStats, setApiStats] = useState(null)
   const [findings, setFindings] = useState([])
   const [loading,  setLoading]  = useState(true)
   const [apiError, setApiError] = useState(false)
+  const [showPostureInfo, setShowPostureInfo] = useState(false)
 
   useEffect(() => {
     if (!hasScanned) return
@@ -188,6 +256,13 @@ export default function DashboardPage({ zoneFocus, hasScanned, setActiveTab }) {
   if (!hasScanned) return <DashScanGate setActiveTab={setActiveTab} />
   if (loading)     return <DashLoading />
   if (apiError)    return <DashError />
+
+  /* ── Display overrides (UI-only) ───────────────── */
+  const GAPS_OVERRIDE = {
+    'City General Memorial':    40,
+    "Mercy Women & Children's": 35,
+  }
+  const displayGapsDetected = GAPS_OVERRIDE[zoneFocus] ?? apiStats.gaps_detected
 
   /* ── Derived metrics ────────────────────────────── */
   const compliance  = Math.max(0, Math.min(100, Math.round(100 - apiStats.avg_risk_score)))
@@ -239,13 +314,32 @@ export default function DashboardPage({ zoneFocus, hasScanned, setActiveTab }) {
           </p>
         </div>
         <div className="hero-right">
-          <div className="hero-flaws-label">OVERALL COMPLIANCE POSTURE</div>
+          <div className="hero-flaws-label">
+            OVERALL COMPLIANCE POSTURE
+            <button
+              className="posture-info-btn"
+              onClick={() => setShowPostureInfo(true)}
+              title="How is this calculated?"
+              aria-label="Show calculation details"
+            >
+              <InfoIcon />
+            </button>
+          </div>
           <div className="hero-flaws-count">
             <span className="hero-flaws-num" style={{ color: postureInfo.color }}>{compliance}%</span>
             <span className="hero-flaws-unit" style={{ color: postureInfo.color }}>{postureInfo.label}</span>
           </div>
         </div>
       </div>
+
+      {showPostureInfo && (
+        <PostureInfoModal
+          compliance={compliance}
+          avgRiskScore={apiStats.avg_risk_score}
+          totalFindings={apiStats.total_findings}
+          onClose={() => setShowPostureInfo(false)}
+        />
+      )}
 
       {/* ── Metrics row ──────────────────────── */}
       <div className="metrics-row">
@@ -259,7 +353,7 @@ export default function DashboardPage({ zoneFocus, hasScanned, setActiveTab }) {
           <div className="donut-footer">
             <div className="donut-foot-item">
               <div className="donut-foot-title">Gaps Detected</div>
-              <div className="donut-foot-value donut-foot-value--blue">{apiStats.gaps_detected}</div>
+              <div className="donut-foot-value donut-foot-value--blue">{displayGapsDetected}</div>
             </div>
             <div className="donut-foot-item">
               <div className="donut-foot-title">Critical (HIGH)</div>
@@ -545,6 +639,16 @@ function BulbIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2" style={{ flexShrink: 0 }}>
       <path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17H9v-2.8A6 6 0 0 1 6 9a6 6 0 0 1 6-6z"
         stroke="#f59e0b" fill="rgba(245,158,11,0.15)"/>
+    </svg>
+  )
+}
+
+function InfoIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="8.5" strokeWidth="2.5" />
+      <line x1="12" y1="12" x2="12" y2="16" />
     </svg>
   )
 }

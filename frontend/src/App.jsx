@@ -15,7 +15,7 @@ export default function App() {
   // Rules stored per-hospital: { [zone]: { rules: [], totalFindings: 0 } }
   const [zoneRulesMap,  setZoneRulesMap]  = useState({})
   const [hasScanned,    setHasScanned]    = useState(() => {
-    try { return localStorage.getItem('hasScanned') === 'true' } catch { return false }
+    try { return sessionStorage.getItem('hasScanned') === 'true' } catch { return false }
   })
   const [archivedClips, setArchivedClips] = useState(() => {
     try {
@@ -31,7 +31,7 @@ export default function App() {
   }, [archivedClips])
 
   useEffect(() => {
-    try { localStorage.setItem('hasScanned', hasScanned ? 'true' : 'false') } catch {}
+    try { sessionStorage.setItem('hasScanned', hasScanned ? 'true' : 'false') } catch {}
   }, [hasScanned])
 
   // Fetch rules for the current zone if not yet loaded (or on first scan)
@@ -96,7 +96,7 @@ export default function App() {
                 stable={stableRules}
               />
             )}
-            <RulesMatrix rules={rules} setRules={setRules} totalFindings={totalFindings} roleState={roleState} zoneFocus={zoneFocus} />
+            <RulesMatrix rules={rules} setRules={setRules} totalFindings={totalFindings} roleState={roleState} zoneFocus={zoneFocus} hasScanned={hasScanned} />
           </>
         )
 

@@ -265,6 +265,18 @@
   font-size: 13px;
 }
 
+.col-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.55;
+  font-style: italic;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* Coverage */
 .td-coverage { min-width: 160px; }
 
