@@ -10,7 +10,7 @@ const NAV_TABS = [
 ]
 
 const ZONE_OPTIONS = [
-  'St. Jude Trauma Center',
+  'Al Manei',
   'City General Memorial',
   "Mercy Women & Children's",
 ]

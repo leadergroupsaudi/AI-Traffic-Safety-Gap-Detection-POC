@@ -38,7 +38,7 @@ const CLASS_LABELS = {
 }
 
 const ZONES = [
-  'St. Jude Trauma Center',
+  'Al Manei',
   'City General Memorial',
   "Mercy Women & Children's",
 ]

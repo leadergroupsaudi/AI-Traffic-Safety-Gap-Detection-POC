@@ -11,7 +11,7 @@ import './App.css'
 export default function App() {
   const [activeTab,     setActiveTab]     = useState('upload')
   const [roleState,     setRoleState]     = useState('public')
-  const [zoneFocus,     setZoneFocus]     = useState('St. Jude Trauma Center')
+  const [zoneFocus,     setZoneFocus]     = useState('Al Manei')
   // Rules stored per-hospital: { [zone]: { rules: [], totalFindings: 0 } }
   const [zoneRulesMap,  setZoneRulesMap]  = useState({})
   const [hasScanned,    setHasScanned]    = useState(() => {
